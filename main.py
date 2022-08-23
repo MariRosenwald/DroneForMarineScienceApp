@@ -4,11 +4,12 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import Screen
+from kivy.uix.screenmanager import Screen, ScreenManager
 
-class MyGrid(GridLayout):
+
+class OpenScreenGrid(GridLayout):
     def __init__(self, **kwargs):
-        super(MyGrid, self).__init__(**kwargs)
+        super(OpenScreenGrid, self).__init__(**kwargs)
         self.cols = 1
 
         self.topGrid = GridLayout()
@@ -45,10 +46,29 @@ class MyGrid(GridLayout):
         self.date.text = ""
         self.area.text = ""
 
+
+class OpenScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(OpenScreen, self).__init__(**kwargs)
+
+        # self.add_widget(OpenScreenGrid)
+
+
+# class WhichModelScreen(Screen):
+#     def
+# def buttonScreen(GridLayout):
+#     def __init__(self, **kwargs):
+#         super(buttonScreen, self).__init__(**kwargs)
+
+
 class CSCApp(App):
 
     def build(self):
-        return MyGrid()
+        sm = ScreenManager()
+        sm.add_widget(OpenScreen(name="OpenScreen"))
+        # sm.current_screen()
+        return sm
 
 
 if __name__ == "__main__":
