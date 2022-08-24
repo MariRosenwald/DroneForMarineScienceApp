@@ -107,7 +107,9 @@ class SharkScreenGrid(GridLayout):
         self.topGrid.cols = 1
 
         # make sure pillow and ffpyplayer
-        self.player = VideoPlayer(source='/Users/marirosenwald/Downloads/sharkvideo.mp4')
+        # need to have a video downloaded here, note that they were too large for github so access from
+        # google drive:
+        self.player = VideoPlayer(source='sharkvideo.mp4')
         self.player.state = "play"
         self.player.allow_stretch = True
         self.topGrid.add_widget(self.player)
@@ -121,7 +123,7 @@ class SharkScreenGrid(GridLayout):
     def pressedBack(self, instance):
         print("back")
 
-        sm.current = "OpenScreen"
+        sm.current = "WM"
 
 class SharkModelScreen(Screen):
     def __init__(self, **kwargs):
