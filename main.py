@@ -6,7 +6,10 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.videoplayer import VideoPlayer
+import os
 
+
+# import track.py
 
 class OpenScreenGrid(GridLayout):
     def __init__(self, **kwargs):
@@ -80,6 +83,14 @@ class WhichModelGrid(GridLayout):
 
         sm.current = "SharkModelScreen"
 
+        # unknown_dir = os.system("cd doesnotexist")
+        # print("`cd doesnotexis` ran with exit code %d" % unknown_dir)
+        # sv = subprocess.run(
+        #     ["python", "track.py", "--source", "sharkvideo.mp4", "--yolo_model", "NicholasWachterSPModel.pt",
+        #      "--conf-thres", "0.3", "--save-vid"])
+        # print(track.save_path)
+        # print("The exit code was: %d" % sv.returncode)
+
     def pressedCow(self, instance):
         print("cow")
 
@@ -105,11 +116,14 @@ class SharkScreenGrid(GridLayout):
 
         self.topGrid = GridLayout()
         self.topGrid.cols = 1
+        self.bottomGrid = GridLayout()
+        self.bottomGrid.cols = 1
 
         # make sure pillow and ffpyplayer
         # need to have a video downloaded here, note that they were too large for github so access from
         # google drive:
-        self.player = VideoPlayer(source='sharkvideo.mp4')
+        self.ret = "sharkvideo.mp4"
+        self.player = VideoPlayer(source="sharkvideo.mp4")
         self.player.state = "play"
         self.player.allow_stretch = True
         self.topGrid.add_widget(self.player)
@@ -118,12 +132,55 @@ class SharkScreenGrid(GridLayout):
 
         self.backBtn = Button(text="back", font_size=40)
         self.backBtn.bind(on_press=self.pressedBack)
-        self.add_widget(self.backBtn)
+        self.bottomGrid.add_widget(self.backBtn)
+
+        self.DLBtn = Button(text="Run Deep Learning", font_size=40)
+        self.DLBtn.bind(on_press=self.pressedDL)
+        self.bottomGrid.add_widget(self.DLBtn)
+
+        self.add_widget(self.bottomGrid)
 
     def pressedBack(self, instance):
         print("back")
 
         sm.current = "WM"
+
+    def pressedDL(self, instance):
+        # self.DLBtn = Button(text="Running", font_size=40)
+        sv = os.system("python track.py --source sharkvideo.mp4 --yolo_model "
+                       "NicholasWachterSPModel.pt --conf-thres 0.3 --save-vid > out.txt")
+        # print("`cd ~` ran with exit code %d" % sv)
+        out = open("out.txt", "r+")
+        for line in out:
+            if len(line) > 5:
+                ret = line
+            print(line)
+        print("return ", ret)
+        str = ret.split("\n")
+
+        # self.remove_widget(self.player)
+        self.remove_widget(self.topGrid)
+        self.remove_widget(self.bottomGrid)
+
+        self.Rplayer = VideoPlayer(source=str[0])
+        # self.Rplayer = VideoPlayer(source="v2.mp4")
+        self.Rplayer.state = "play"
+        self.Rplayer.allow_stretch = True
+        self.add_widget(self.Rplayer)
+
+        self.backBtn2 = Button(text="back", font_size=40)
+        self.backBtn2.bind(on_press=self.pressedBack2)
+        self.add_widget(self.backBtn2)
+
+    def pressedBack2(self, instance):
+        print("back")
+
+        self.remove_widget(self.Rplayer)
+        self.remove_widget(self.backBtn2)
+
+        self.add_widget(self.topGrid)
+        self.add_widget(self.bottomGrid)
+
 
 class SharkModelScreen(Screen):
     def __init__(self, **kwargs):
@@ -132,18 +189,55 @@ class SharkModelScreen(Screen):
         self.add_widget(SharkScreenGrid())
 
 
+class SharkRScreenGrid(GridLayout):
+    def __init__(self, **kwargs):
+        super(SharkRScreenGrid, self).__init__(**kwargs)
+        self.cols = 1
+
+        self.topGrid = GridLayout()
+        self.topGrid.cols = 1
+        self.bottomGrid = GridLayout()
+        self.bottomGrid.cols = 1
+
+        self.player = VideoPlayer(source=ret)
+        self.player.state = "play"
+        self.player.allow_stretch = True
+        self.topGrid.add_widget(self.player)
+
+        self.add_widget(self.topGrid)
+
+        self.backBtn = Button(text="back", font_size=40)
+        self.backBtn.bind(on_press=self.pressedBack)
+        self.bottomGrid.add_widget(self.backBtn)
+
+        self.add_widget(self.bottomGrid)
+
+    def pressedBack(self, instance):
+        print("back")
+
+        sm.current = "SharkModelScreen"
+
+
+class SharkResultScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SharkResultScreen, self).__init__(**kwargs)
+
+        self.add_widget(SharkRScreenGrid())
+
 
 sm = ScreenManager()
 sm.add_widget(OpenScreen(name="OpenScreen"))
 sm.add_widget(WhichModelScreen(name="WM"))
 sm.add_widget(SharkModelScreen(name="SharkModelScreen"))
 sm.current = "OpenScreen"
+ret = "sharkvideo.mp4"
 
 
 class CSCApp(App):
 
     def build(self):
         return sm
+
 
 if __name__ == "__main__":
     CSCApp().run()
