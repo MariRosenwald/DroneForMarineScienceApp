@@ -1,6 +1,7 @@
 How to run: 
 Download the WHOLE folder Nick posted on google drive - something like 26,181 files 
 Unzip the downloaded folder (to do this right click on the folder and select “Extract All” or “Extract”
+
 For Windows: 
 Open your computer’s terminal 
 cd to the unzipped folder and open the folder 
