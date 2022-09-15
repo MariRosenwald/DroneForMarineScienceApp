@@ -13,6 +13,14 @@ Copy the contents from Nick’s yolo_env/bin folder
 Paste (without replacing the existing files) into your new virtual environment’s Scripts folder (when it asks if you want to replace the existing 10-ish files, SAY NO) 
 Back in the terminal - activate your virtual environment 
 Command: .\<yolo_env2>\Scripts\activate 
+
+For MacOS:
+Open your computer’s terminal
+cd to the unzipped folder and open the folder
+Open yolo_env virtual environment
+Command: source yolo_env/bin/activate
+
+Continue here:
 Install the required libraries
 Command: pip install -r requirements.txt 
 Command: pip install pillow
@@ -22,3 +30,5 @@ Command: python -m pip install "kivy[base]" kivy_examples
 Run the program: 
 Commend: python main.py
 Note: you must have the video you want evaluated in the same folder as main.py and named "sharkvideo.mp4" 
+
+Note: if issues pop up with python or pip command, try python3 & pip3
