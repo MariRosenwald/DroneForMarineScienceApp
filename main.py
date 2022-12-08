@@ -8,6 +8,8 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.videoplayer import VideoPlayer
 import os
 
+# emily added
+from kivy.uix.camera import Camera
 
 # import track.py
 
@@ -138,16 +140,25 @@ class SharkScreenGrid(GridLayout):
         self.DLBtn.bind(on_press=self.pressedDL)
         self.bottomGrid.add_widget(self.DLBtn)
 
+        # emily added code here
+        self.camBtn = Button(text="Open Camera", font_size=40)
+        self.camBtn.bind(on_press=self.pressedCam)
+        self.bottomGrid.add_widget(self.camBtn)
+
         self.add_widget(self.bottomGrid)
+
+    # emily added code here
+    def pressedCam(self, instance):
+        print("cam")
+        sm.current = "CAM"
 
     def pressedBack(self, instance):
         print("back")
-
         sm.current = "WM"
 
     def pressedDL(self, instance):
         # self.DLBtn = Button(text="Running", font_size=40)
-        sv = os.system("python track.py --source sharkvideo.mp4 --yolo_model "
+        sv = os.system("python3 track.py --source sharkvideo.mp4 --yolo_model "
                        "NicholasWachterSPModel.pt --conf-thres 0.3 --save-vid > out.txt")
         # print("`cd ~` ran with exit code %d" % sv)
         out = open("out.txt", "r+")
@@ -181,6 +192,67 @@ class SharkScreenGrid(GridLayout):
         self.add_widget(self.topGrid)
         self.add_widget(self.bottomGrid)
 
+# emily added code here
+class CamScreenGrid(GridLayout):
+    def __init__(self, **kwargs):
+        super(CamScreenGrid, self).__init__(**kwargs)
+
+        self.cols = 1
+
+        self.topGrid = GridLayout()
+        self.topGrid.cols = 1
+        self.bottomGrid = GridLayout()
+        self.bottomGrid.cols = 1
+
+        #create a camera object
+        self.cameraObject = Camera(play=False)
+        self.cameraObject.play = True
+        #self.cameraObject.resolution = (640, 480) #can change the resolution
+
+        self.add_widget(self.cameraObject)
+
+        self.DLBtn = Button(text="Run Deep Learning", font_size=40)
+        self.DLBtn.bind(on_press=self.pressedDL)
+        self.bottomGrid.add_widget(self.DLBtn)
+
+        self.backBtn = Button(text="back", font_size=40)
+        self.backBtn.bind(on_press=self.pressedBack)
+        self.bottomGrid.add_widget(self.backBtn)
+
+        self.add_widget(self.bottomGrid)
+
+    def pressedDL(self, instance):
+        print("run DL on camera feed")
+        # self.DLBtn = Button(text="Running", font_size=40)
+        sv = os.system("python3 track.py --source 0 --yolo_model "
+                       "NicholasWachterSPModel.pt --conf-thres 0.3 --save-vid > out.txt")
+        # print("`cd ~` ran with exit code %d" % sv)
+        out = open("out.txt", "r+")
+        for line in out:
+            if len(line) > 5:
+                ret = line
+            print(line)
+        print("return ", ret)
+        str = ret.split("\n")
+
+        # self.remove_widget(self.player)
+        self.remove_widget(self.topGrid)
+        self.remove_widget(self.bottomGrid)
+
+        self.Rplayer = VideoPlayer(source=0)
+        # self.Rplayer = VideoPlayer(source="v2.mp4")
+        self.Rplayer.state = "play"
+        self.Rplayer.allow_stretch = True
+        self.add_widget(self.Rplayer)
+
+        self.backBtn2 = Button(text="back", font_size=40)
+        self.backBtn2.bind(on_press=self.pressedBack2)
+        self.add_widget(self.backBtn2)
+
+    def pressedBack(self, instance):
+        print("back")
+
+        sm.current = "SharkModelScreen"
 
 class SharkModelScreen(Screen):
     def __init__(self, **kwargs):
@@ -188,6 +260,12 @@ class SharkModelScreen(Screen):
 
         self.add_widget(SharkScreenGrid())
 
+# emily added code
+class CamScreen(Screen):
+    def __init__(self, **kwargs):
+        super(CamScreen, self).__init__(**kwargs)
+
+        self.add_widget(CamScreenGrid())
 
 class SharkRScreenGrid(GridLayout):
     def __init__(self, **kwargs):
@@ -229,6 +307,7 @@ sm = ScreenManager()
 sm.add_widget(OpenScreen(name="OpenScreen"))
 sm.add_widget(WhichModelScreen(name="WM"))
 sm.add_widget(SharkModelScreen(name="SharkModelScreen"))
+sm.add_widget(CamScreen(name="CAM")) # emily added code
 sm.current = "OpenScreen"
 ret = "sharkvideo.mp4"
 
@@ -237,7 +316,6 @@ class CSCApp(App):
 
     def build(self):
         return sm
-
 
 if __name__ == "__main__":
     CSCApp().run()
